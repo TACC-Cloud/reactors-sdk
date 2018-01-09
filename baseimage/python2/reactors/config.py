@@ -9,6 +9,7 @@ Optional: Override any 1st or 2nd level key
 
 # Usage: from config import settings
 import os
+import logging
 import yaml
 from attrdict import AttrDict
 
@@ -33,7 +34,10 @@ def read_config():
             try:
                 with open(fname, "r") as conf:
                     try:
-                        config = AttrDict(yaml.safe_load(conf))
+                        config = yaml.safe_load(conf)
+                        if config is None:
+                            config = {}
+                        config = AttrDict(conf)
                     except yaml.YAMLError as e:
                         if hasattr(e, 'problem_mark'):
                             mark = e.problem_mark
@@ -44,7 +48,7 @@ def read_config():
                             print("YAML error in {}: {}".format(fname, e))
                 break
             except Exception as e:
-                print("Exception was detected but swallowed: {}".format(e))
+                logging.exception(e)
                 pass
 
     # TODO - Check for duplicate keys coming in from ENV

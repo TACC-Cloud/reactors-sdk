@@ -14,6 +14,9 @@ PWD = os.getcwd()
 ROOT = '/'
 SCHEMA_FILE = 'message.json'
 
+builder = None
+ns = None
+
 def read_schema():
     """
     Reads JSON schema into 'settings', allowing optional
@@ -21,23 +24,16 @@ def read_schema():
     """
     config = AttrDict()
     # File-based configuration.
-    places = [ROOT HERE]
+    places = [ROOT, HERE]
     for p in places:
-        fname = os.path.join(p, CONFIG)
+        fname = os.path.join(p, SCHEMA_FILE)
         if os.path.isfile(fname):
             try:
                 with open(fname, "r") as conf:
                     try:
-                        config = AttrDict(yaml.safe_load(conf))
-                    except yaml.YAMLError as e:
-                        if hasattr(e, 'problem_mark'):
-                            mark = e.problem_mark
-                            print(
-                                "YAML error in {}: Line {} / Col {}".format(
-                                    fname, mark.line + 1, mark.column + 1))
-                        else:
-                            print("YAML error in {}: {}".format(fname, e))
+                        builder = pjs.ObjectBuilder(fname)
+                        ns = builder.build_classes()
+                    except Exception as e:
+                            print("Error loading schema {}: {}".format(fname, e))
+                            pass
                 break
-            except Exception as e:
-                print("Exception was detected but swallowed: {}".format(e))
-                pass

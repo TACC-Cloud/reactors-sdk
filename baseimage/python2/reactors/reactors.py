@@ -19,7 +19,7 @@ from logs import *
 from uniqueid import get_id
 from storage import *
 
-VERSION = '0.2.0'
+VERSION = '0.5.0'
 
 def utcnow():
     """
